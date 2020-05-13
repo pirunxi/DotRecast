@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfect.DotRecast", "Perfect.DotRecast\Perfect.DotRecast.csproj", "{5D0C3CF6-DB15-4EE2-A7EF-7337FC2F3948}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{166C9C63-C139-4260-9604-F554F94C7F27}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D0C3CF6-DB15-4EE2-A7EF-7337FC2F3948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0C3CF6-DB15-4EE2-A7EF-7337FC2F3948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0C3CF6-DB15-4EE2-A7EF-7337FC2F3948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0C3CF6-DB15-4EE2-A7EF-7337FC2F3948}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {352F5C90-0502-4224-AA59-1B707008ECFA}
+	EndGlobalSection
+EndGlobal
