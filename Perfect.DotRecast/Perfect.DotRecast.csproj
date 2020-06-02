@@ -8,8 +8,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Perfect.Core" Version="1.1.0.13" />
-  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(OutDir)Perfect.DotRecast.dll ..\Demo\Assets\Plugins" />
+  </Target>
 
 </Project>

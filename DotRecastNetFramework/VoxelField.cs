@@ -158,7 +158,7 @@ namespace Perfect.DotRecast
         /// <param name="minSpanMergeThreshold"> 当两个span相交时，如果它们的最大高度相差不超过 minSpanMergeThreshold,合并它们  </param>
         public void RasterizeTriangles(MarkedTriangleSet compactTriangleSet, float walkableSlopeDegree, int minSpanMergeThreshold, ERasterzationAlgorithm algorithm)
         {
-            float walkableSlope = MathF.Cos(walkableSlopeDegree * MathF.PI / 180f);
+            float walkableSlope = (float)Math.Cos(walkableSlopeDegree * Math.PI / 180f);
 
             foreach (MarkedTriangle tri in compactTriangleSet.Triangles)
             {
@@ -353,8 +353,8 @@ namespace Perfect.DotRecast
             float inverseZCellSize = 1f / ZCellSize;
             float inverseYCellSize = 1f / YCellSize;
 
-            int zStartCellIndex = Math.Clamp((int)((min.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
-            int zEndCellIndex = Math.Clamp((int)((max.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
+            int zStartCellIndex = MathUtil.Clamp((int)((min.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
+            int zEndCellIndex = MathUtil.Clamp((int)((max.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
 
 
             // 将输入的多边形以 divZ 为界，分割为两个多边形
@@ -415,8 +415,8 @@ namespace Perfect.DotRecast
                 }
 
                 // 计算起始 x cell index
-                int xStartCellIndex = Math.Clamp((int)((minX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
-                int xEndCellIndex = Math.Clamp((int)((maxX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
+                int xStartCellIndex = MathUtil.Clamp((int)((minX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
+                int xEndCellIndex = MathUtil.Clamp((int)((maxX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
 
 
                 Vector3[] xOutRow = _cacheBuf4;
@@ -562,18 +562,18 @@ namespace Perfect.DotRecast
             float inverseZCellSize = 1f / ZCellSize;
             float inverseYCellSize = 1f / YCellSize;
 
-            int ix1 = Math.Clamp((int)((p1.X - _minBound.X) * inverseXCellSize), 0, XWidth);
-            int ix2 = Math.Clamp((int)((p2.X - _minBound.X) * inverseXCellSize), 0, XWidth);
-            int ix3 = Math.Clamp((int)((p3.X - _minBound.X) * inverseXCellSize), 0, XWidth);
+            int ix1 = MathUtil.Clamp((int)((p1.X - _minBound.X) * inverseXCellSize), 0, XWidth);
+            int ix2 = MathUtil.Clamp((int)((p2.X - _minBound.X) * inverseXCellSize), 0, XWidth);
+            int ix3 = MathUtil.Clamp((int)((p3.X - _minBound.X) * inverseXCellSize), 0, XWidth);
 
 
             int iy1 = Math.Max((int)((p1.Y - _minBound.Y) * inverseYCellSize), 0);
             int iy2 = Math.Max((int)((p2.Y - _minBound.Y) * inverseYCellSize), 0);
             int iy3 = Math.Max((int)((p3.Y - _minBound.Y) * inverseYCellSize), 0);
 
-            int iz1 = Math.Clamp((int)((p1.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
-            int iz2 = Math.Clamp((int)((p2.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
-            int iz3 = Math.Clamp((int)((p3.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
+            int iz1 = MathUtil.Clamp((int)((p1.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
+            int iz2 = MathUtil.Clamp((int)((p2.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
+            int iz3 = MathUtil.Clamp((int)((p3.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
 
 
             if (ix1 < ix2)

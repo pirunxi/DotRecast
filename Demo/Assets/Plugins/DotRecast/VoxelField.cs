@@ -118,7 +118,7 @@ namespace Perfect.DotRecast
 
 
 #pragma warning disable CA1819 // Properties should not return arrays
-        private VoxelPillar[,] VoxelPillarXZArray { get; }
+        public VoxelPillar[,] VoxelPillarXZArray { get; }
 #pragma warning restore CA1819 // Properties should not return arrays
 
 
@@ -132,7 +132,7 @@ namespace Perfect.DotRecast
         /// <param name="xCellSize">x 轴 cell size</param>
         /// <param name="zCellSize">z 轴 cell size</param>
         /// <param name="yCellSize">y 轴 cell size</param>
-        public VoxelField(int xWidth, int zWidth, Vector3 minBound, Vector3 maxBound, float xCellSize, float zCellSize, float yCellSize)
+        public VoxelField(int xWidth, int zWidth, Vector3 minBound, Vector3 maxBound, float xCellSize, float yCellSize, float zCellSize)
         {
             Debug.Assert(xWidth > 0 && zWidth > 0);
             Debug.Assert(xCellSize > 0 && yCellSize > 0 && zCellSize > 0);
@@ -155,10 +155,14 @@ namespace Perfect.DotRecast
         /// </summary>
         /// <param name="compactTriangleSet"> 需要被体素化的 三角形集合</param>
         /// <param name="walkableSlopDegree"> 能够攀爬的最大斜坡角度.[0,90] 0表示平面,90度表示垂直地面</param>
-        /// <param name="minSpanMergeThreshold"> 当两个span相交时，如果它们的最大高度相差不超过 minSpanMergeThreshold,合并它们  </param>
+        /// <param name="minSpanMergeThreshold">
+        /// 当两个span相交时，如果它们的最大高度相差不超过 minSpanMergeThreshold,合并它们。这两个span处于不同区域时，合并后应该用哪个区域呢？
+        /// recast 选择了area id大的那个，这个选择本无特别的道理，不过由于NOT_WALKABLE_AREA=-1，可行走区域id都>0，这么做正巧导致合并可行走与不可行走区域时，
+        /// 合并后的区域为可行走区域，所以最终使用了此策略。
+        /// </param>
         public void RasterizeTriangles(MarkedTriangleSet compactTriangleSet, float walkableSlopeDegree, int minSpanMergeThreshold, ERasterzationAlgorithm algorithm)
         {
-            float walkableSlope = MathF.Cos(walkableSlopeDegree * MathF.PI / 180f);
+            float walkableSlope = (float)Math.Cos(walkableSlopeDegree * Math.PI / 180f);
 
             foreach (MarkedTriangle tri in compactTriangleSet.Triangles)
             {
@@ -176,6 +180,16 @@ namespace Perfect.DotRecast
         private readonly Vector3[] _cacheBuf5 = new Vector3[7];
 
 
+        /// <summary>
+        /// 与 <see cref="DividePolyByZAlix"/>  类似
+        /// </summary>
+        /// <param name="inPoly"></param>
+        /// <param name="inVertNum"></param>
+        /// <param name="outRowPoly"></param>
+        /// <param name="outRowVertNum"></param>
+        /// <param name="remainPoly"></param>
+        /// <param name="outRemainPolyVertNum"></param>
+        /// <param name="splitX"></param>
         private void DividePolyByXAlix(Vector3[] inPoly, int inVertNum, Vector3[] outRowPoly, out int outRowVertNum,
             Vector3[] remainPoly, out int outRemainPolyVertNum, float splitX)
         {
@@ -266,8 +280,8 @@ namespace Perfect.DotRecast
             //   /__|__|___|__ __\
             //      |  |   |
             //
-            // 如上图的方式进行切分，每次切割出“一条”
-            // 根据 三角形的情况，每“条” 最多 5个顶点
+            // 如上图的方式进行切分，每次切割出“割条”
+            // 根据 三角形的情况，每条“割条” 最多 5个顶点
             // 再 沿另一个轴的方向切割后，每“块” 最多 7个顶点
 
             float[] deltaZs = _cacheFloats;
@@ -309,15 +323,19 @@ namespace Perfect.DotRecast
                 {
                     // 这儿略微重构了 recast 的写法
                     // 它的代码有点令人困惑
+
+                    // 如果全在左侧，该顶点属于 "割条"
                     if (curDeltaZ > 0)
                     {
                         outRowPoly[rowVertexNum++] = curVertex;
                     }
+                    // 如果正巧在分割线上，该顶点属于 “割条”和 剩余多边形
                     else if (curDeltaZ == 0)
                     {
                         outRowPoly[rowVertexNum++] = curVertex;
                         remainPoly[remainPolyVertexNum++] = curVertex;
                     }
+                    // 如果全在右侧，该顶点属于 剩余多边形
                     else
                     {
                         remainPoly[remainPolyVertexNum++] = curVertex;
@@ -353,8 +371,8 @@ namespace Perfect.DotRecast
             float inverseZCellSize = 1f / ZCellSize;
             float inverseYCellSize = 1f / YCellSize;
 
-            int zStartCellIndex = Math.Clamp((int)((min.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
-            int zEndCellIndex = Math.Clamp((int)((max.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
+            int zStartCellIndex = MathUtil.Clamp((int)((min.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
+            int zEndCellIndex = MathUtil.Clamp((int)((max.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth - 1);
 
 
             // 将输入的多边形以 divZ 为界，分割为两个多边形
@@ -415,8 +433,8 @@ namespace Perfect.DotRecast
                 }
 
                 // 计算起始 x cell index
-                int xStartCellIndex = Math.Clamp((int)((minX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
-                int xEndCellIndex = Math.Clamp((int)((maxX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
+                int xStartCellIndex = MathUtil.Clamp((int)((minX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
+                int xEndCellIndex = MathUtil.Clamp((int)((maxX - _minBound.X) * inverseXCellSize), 0, XWidth - 1);
 
 
                 Vector3[] xOutRow = _cacheBuf4;
@@ -476,6 +494,7 @@ namespace Perfect.DotRecast
         }
 
 
+        #region custom rasterization
 
         /// <summary>
         /// 三角形体素化。
@@ -562,18 +581,18 @@ namespace Perfect.DotRecast
             float inverseZCellSize = 1f / ZCellSize;
             float inverseYCellSize = 1f / YCellSize;
 
-            int ix1 = Math.Clamp((int)((p1.X - _minBound.X) * inverseXCellSize), 0, XWidth);
-            int ix2 = Math.Clamp((int)((p2.X - _minBound.X) * inverseXCellSize), 0, XWidth);
-            int ix3 = Math.Clamp((int)((p3.X - _minBound.X) * inverseXCellSize), 0, XWidth);
+            int ix1 = MathUtil.Clamp((int)((p1.X - _minBound.X) * inverseXCellSize), 0, XWidth);
+            int ix2 = MathUtil.Clamp((int)((p2.X - _minBound.X) * inverseXCellSize), 0, XWidth);
+            int ix3 = MathUtil.Clamp((int)((p3.X - _minBound.X) * inverseXCellSize), 0, XWidth);
 
 
             int iy1 = Math.Max((int)((p1.Y - _minBound.Y) * inverseYCellSize), 0);
             int iy2 = Math.Max((int)((p2.Y - _minBound.Y) * inverseYCellSize), 0);
             int iy3 = Math.Max((int)((p3.Y - _minBound.Y) * inverseYCellSize), 0);
 
-            int iz1 = Math.Clamp((int)((p1.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
-            int iz2 = Math.Clamp((int)((p2.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
-            int iz3 = Math.Clamp((int)((p3.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
+            int iz1 = MathUtil.Clamp((int)((p1.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
+            int iz2 = MathUtil.Clamp((int)((p2.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
+            int iz3 = MathUtil.Clamp((int)((p3.Z - _minBound.Z) * inverseZCellSize), 0, ZWidth);
 
 
             if (ix1 < ix2)
@@ -681,6 +700,7 @@ namespace Perfect.DotRecast
 
         }
 
+        #endregion
 
         private void AddSpan(int x, int z, int minY, int maxY, int area, int minSpanMergeThreshold)
         {
@@ -689,7 +709,55 @@ namespace Perfect.DotRecast
             {
                 vexelPillar.Spans = new List<VoxelHeightSpan>();
             }
-            vexelPillar.Spans.Add(new VoxelHeightSpan(minY, maxY, area));
+            List<VoxelHeightSpan> spans = vexelPillar.Spans;
+
+            int i;
+            int spanCount = spans.Count;
+            for (i = 0; i < spanCount; i++)
+            {
+                VoxelHeightSpan span = spans[i];
+                // 如果 新span的maxY小于当前span.minY,说明在当前span下方，应该插入当前span的位置
+                if (maxY < span.MinY)
+                {
+                    //spans.Insert(i, new VoxelHeightSpan(minY, maxY, area));
+                    //inserted = true;
+                    break;
+                }
+                // 如果新span的minY小于当前span.maxY,说明在当前span上方，继续查找下一个
+                else if (minY > span.MaxY)
+                {
+                    continue;
+                }
+                // 说明新span与当前span相交。注意！有可能与连续几个span相交
+                else
+                {
+                    int mergeEnd = i;
+                    do
+                    {
+                        if (minY > span.MinY)
+                        {
+                            minY = span.MinY;
+                        }
+                        if (maxY < span.MaxY)
+                        {
+                            maxY = span.MaxY;
+                        }
+                        if (Math.Abs(maxY - span.MaxY) <= minSpanMergeThreshold)
+                        {
+                            area = Math.Max(area, span.Area);
+                        }
+                        ++mergeEnd;
+                    } while (mergeEnd < spanCount && maxY >= (span = spans[mergeEnd]).MinY);
+                    if (mergeEnd > i + 1)
+                    {
+                        spans.RemoveRange(i + 1, mergeEnd - i - 1);
+                    }
+                    //spans[i] = new VoxelHeightSpan(minY, maxY, area);
+                    //inserted = true;
+                    break;
+                }
+            }
+            spans.Insert(i, new VoxelHeightSpan(minY, maxY, area));
         }
     }
 }
