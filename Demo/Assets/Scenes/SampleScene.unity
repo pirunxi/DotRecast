@@ -166,9 +166,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce176a4f31efb54eb9d907e3c049538, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  a: {x: 10, y: 0, z: 0}
-  b: {x: 0, y: 10, z: 0}
-  c: {x: 0, y: 0, z: 10}
+  triangles:
+  - p1: {x: 10, y: 0, z: 0}
+    p2: {x: 0, y: 10, z: 0}
+    p3: {x: 0, y: 0, z: 10}
   xCellSize: 1
   yCellSize: 1
   zCellSize: 1

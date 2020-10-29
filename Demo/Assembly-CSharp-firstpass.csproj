@@ -45,14 +45,14 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Plugins\DotRecast\Bound3.cs" />
      <Compile Include="Assets\Plugins\DotRecast\Consts.cs" />
      <Compile Include="Assets\Plugins\DotRecast\EAreaFlags.cs" />
      <Compile Include="Assets\Plugins\DotRecast\ETriangleFlags.cs" />
      <Compile Include="Assets\Plugins\DotRecast\HeightField.cs" />
      <Compile Include="Assets\Plugins\DotRecast\MarkedTriangleSet.cs" />
-     <Compile Include="Assets\Plugins\DotRecast\MathUtil.cs" />
+     <Compile Include="Assets\Plugins\DotRecast\Maths\Bound3.cs" />
      <Compile Include="Assets\Plugins\DotRecast\Rasterzation\RecastRasterzation.cs" />
+     <Compile Include="Assets\Plugins\DotRecast\Utils\MathUtil.cs" />
      <Compile Include="Assets\Plugins\DotRecast\Utils\ValueUtil.cs" />
      <Compile Include="Assets\Plugins\DotRecast\VoxelField.cs" />
  <Reference Include="UnityEngine">
